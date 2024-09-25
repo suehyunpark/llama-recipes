@@ -54,8 +54,13 @@ def tokenize_dialog(dialog, tokenizer):
 
 
 def get_arc_dataset(dataset_config, tokenizer, split):
-    dataset = load_dataset("json", data_files=dataset_config.data_path, split=split)
-    dataset = dataset.map(lambda x: tokenize_dialog(x["messages"], tokenizer), remove_columns=dataset.column_names)
+    dataset = load_dataset("json", data_files=dataset_config.data_path, field=field, split="train")
+    dataset = dataset.map(
+        lambda x: tokenize_dialog(x["messages"], tokenizer),
+        remove_columns=dataset.column_names,
+        batched=True,
+        batch_size=100  # Adjust this value based on your memory constraints
+    )
     print(tokenizer.decode(dataset[0]["input_ids"]))
     print(dataset[0]["labels"])
     return dataset
