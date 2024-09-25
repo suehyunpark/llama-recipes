@@ -6,6 +6,7 @@
 import copy
 import datasets
 import itertools
+from datasets import load_dataset
 
 
 B_INST, E_INST = "[INST]", "[/INST]"
@@ -50,6 +51,14 @@ def tokenize_dialog(dialog, tokenizer):
     }
 
     return dict(combined_tokens, attention_mask=[1]*len(combined_tokens["input_ids"]))
+
+
+def get_arc_dataset(dataset_config, tokenizer, split):
+    dataset = load_dataset("json", data_files=dataset_config.data_path, split=split)
+    dataset = dataset.map(lambda x: tokenize_dialog(x["messages"], tokenizer), remove_columns=dataset.column_names)
+    print(tokenizer.decode(dataset[0]["input_ids"]))
+    print(dataset[0]["labels"])
+    return dataset
 
 
 def get_custom_dataset(dataset_config, tokenizer, split):
