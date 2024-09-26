@@ -134,7 +134,12 @@ def main(**kwargs):
         processor.tokenizer.padding_side='right'
     elif config.model_type == "llama":
         is_vision = False
-        model = AutoModel.from_pretrained(
+        if train_config.use_liger_kernel:
+            from liger_kernel.transformers import AutoLigerKernelForCausalLM
+            model_class = AutoLigerKernelForCausalLM
+        else:
+            model_class = AutoModel
+        model = model_class.from_pretrained(
             train_config.model_name,
             quantization_config=bnb_config,
             use_cache=use_cache,
