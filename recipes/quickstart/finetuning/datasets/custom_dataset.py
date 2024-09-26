@@ -7,6 +7,7 @@ import copy
 import datasets
 import itertools
 from datasets import load_dataset
+import torch
 
 
 B_INST, E_INST = "[INST]", "[/INST]"
@@ -49,6 +50,13 @@ def tokenize_dialog(dialog, tokenizer):
         "input_ids": list(itertools.chain(*(t for t in dialog_tokens))),
         "labels": list(itertools.chain(*(t for t in labels_tokens))),
     }
+    
+    # Check for nan values in the input using torch
+    input_ids_tensor = torch.tensor(combined_tokens["input_ids"])
+    labels_tensor = torch.tensor(combined_tokens["labels"])
+    
+    if torch.isnan(input_ids_tensor).any() or torch.isnan(labels_tensor).any():
+        raise ValueError("NaN values detected in the input")
 
     return dict(combined_tokens, attention_mask=[1]*len(combined_tokens["input_ids"]))
 
