@@ -7,7 +7,6 @@ import copy
 import datasets
 import itertools
 from datasets import load_dataset
-import torch
 
 
 B_INST, E_INST = "[INST]", "[/INST]"
@@ -51,17 +50,10 @@ def tokenize_dialog(dialog, tokenizer):
         "labels": list(itertools.chain(*(t for t in labels_tokens))),
     }
     
-    # Check for nan values in the input using torch
-    input_ids_tensor = torch.tensor(combined_tokens["input_ids"])
-    labels_tensor = torch.tensor(combined_tokens["labels"])
-    
-    if torch.isnan(input_ids_tensor).any() or torch.isnan(labels_tensor).any():
-        raise ValueError("NaN values detected in the input")
-
     return dict(combined_tokens, attention_mask=[1]*len(combined_tokens["input_ids"]))
 
 
-def get_arc_dataset(dataset_config, tokenizer, split):
+def get_custom_dataset(dataset_config, tokenizer, split):
     dataset = load_dataset("json", data_files=dataset_config.data_path, field=split, split="train")
     dataset = dataset.map(
         lambda x: tokenize_dialog(x["messages"], tokenizer),
@@ -69,12 +61,12 @@ def get_arc_dataset(dataset_config, tokenizer, split):
         # batched=True,  # TODO: implement batch tokenizing
         # batch_size=100  # Adjust this value based on your memory constraints
     )
-    # print(tokenizer.decode(dataset[0]["input_ids"]))
-    # print(dataset[0]["labels"])
+    print(f"Before filtering: {len(dataset)}")
+    dataset = dataset.filter(lambda example: len(example["input_ids"]) <= 32768)
+    print(f"After filtering: {len(dataset)}")
     return dataset
 
-
-def get_custom_dataset(dataset_config, tokenizer, split):
+def get_custom_dataset_example(dataset_config, tokenizer, split):
     dataset = datasets.load_dataset("OpenAssistant/oasst1", split=split)
 
     dataset = dataset.map(lambda sample: {
