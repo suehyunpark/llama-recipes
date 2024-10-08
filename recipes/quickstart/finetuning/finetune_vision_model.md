@@ -1,7 +1,7 @@
-## Fine-Tuning Meta Llama Multi Modal Models recipe
+## Llama 3.2 Vision Models Fine-Tuning Recipe
 This recipe steps you through how to finetune a Llama 3.2 vision model on the OCR VQA task using the [OCRVQA](https://huggingface.co/datasets/HuggingFaceM4/the_cauldron/viewer/ocrvqa?row=0) dataset.
 
-**Disclaimer**: As our vision models already have a very good OCR ability, here we just use the OCRVQA dataset only for demonstration purposes of the required steps for fine-tuning our vision models with llama-recipes.
+**Disclaimer**: As our vision models already have a very good OCR ability, here we use the OCRVQA dataset only for demonstration purposes of the required steps for fine-tuning our vision models with llama-recipes.
 
 ### Fine-tuning steps
 
@@ -28,6 +28,6 @@ In order to use a custom dataset, please follow the steps below:
 
 1. Create a new dataset python file under `recipes/quickstart/finetuning/dataset` folder.
 2. In this python file, you need to define a `get_custom_dataset(dataset_config, processor, split, split_ratio=0.9)` function that handles the data loading.
-3. In this python file, you need to define a `get_data_collator(processor)` that returns a custom data collator that can be used by the Pytorch Data Loader.
+3. In this python file, you need to define a `get_data_collator(processor)` class that returns a custom data collator that can be used by the Pytorch Data Loader.
 4. This custom data collator class must have a `__call__(self, samples)` function that converts the image and text samples into the actual inputs that vision model expects.
-5. Run the `torchrun` commend from above section, please change the `--custom_dataset.file` to the new dataset python file, adjust the learning rate accordingly.
+5. Run the `torchrun` command from above section, please change the `--custom_dataset.file` to the new dataset python file, adjust the learning rate accordingly.
