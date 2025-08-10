@@ -9,6 +9,7 @@ class wandb_config:
     project: str = 'llama_recipes' # wandb project name
     entity: Optional[str] = None # wandb entity name
     job_type: Optional[str] = None
+    name: Optional[str] = None
     tags: Optional[List[str]] = None
     group: Optional[str] = None
     notes: Optional[str] = None
